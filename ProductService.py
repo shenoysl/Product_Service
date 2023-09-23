@@ -32,7 +32,7 @@ def get_all_products():
     return jsonify({"products": products})
 
 # Endpoint 2: Get a specific product by ID
-@app.route('https://shenoy-product-service.onrender.com/products/<int:product_id>', methods=['GET'])
+@app.route('/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
     product = next((product for product in products if product["id"] == product_id), None)
     if product:
@@ -41,7 +41,7 @@ def get_product(product_id):
         return jsonify({"error": "Product not found"}), 404
     
 # Endpoint 3: Create a new product
-@app.route('https://shenoy-product-service.onrender.com/products', methods=['POST'])
+@app.route('/products', methods=['POST'])
 def add_product():
     data = request.json
     if "name" not in data or "price" not in data or "quantity" not in data:
@@ -59,7 +59,7 @@ def add_product():
     return jsonify({"message": "Product created", "product": new_product}), 201
 
 # Endpoint 4: Decrease the quantity of a product (when user adds product to cart)
-@app.route('https://shenoy-product-service.onrender.com/products/remove/<int:product_id>', methods=['POST'])
+@app.route('/products/remove/<int:product_id>', methods=['POST'])
 def decrease_quantity_product(product_id):
     for product in products:
         if product["id"] == product_id:
@@ -67,7 +67,7 @@ def decrease_quantity_product(product_id):
         return jsonify({"updated product": product})
 
 # Endpoint 5: Increase the quantity of a product (when user removes product from cart)
-@app.route('https://shenoy-product-service.onrender.com/products/add/<int:product_id>', methods=['POST'])
+@app.route('/products/add/<int:product_id>', methods=['POST'])
 def increase_quantity_product(product_id):
     for product in products:
         if product["id"] == product_id:
@@ -76,7 +76,7 @@ def increase_quantity_product(product_id):
        
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8001)
+    app.run(debug=True, port=8001, host='https://shenoy-product-service.onrender.com')
 
 
 
