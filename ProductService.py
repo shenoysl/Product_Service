@@ -11,8 +11,6 @@
 # /products (POST): Allow the addition of new grocery products to the inventory with information
 # such as name, price, and quantity
 #----------------------------------------------------------------------------------------------------#
-#https://shenoy-product-service.onrender.com
-
 
 import os
 from flask import Flask, jsonify, request
@@ -29,14 +27,14 @@ products = [
 # Endpoint 1: Get all products
 @app.route('/products', methods=['GET'])
 def get_all_products():
-    return jsonify({"products": products})
+    return jsonify({"products": products}), 201
 
 # Endpoint 2: Get a specific product by ID
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_product(product_id):
     product = next((product for product in products if product["id"] == product_id), None)
     if product:
-        return jsonify({"product": product})
+        return jsonify({"product": product}), 201
     else:
         return jsonify({"error": "Product not found"}), 404
     
@@ -59,33 +57,23 @@ def add_product():
     return jsonify({"message": "Product created", "product": new_product}), 201
 
 # Endpoint 4: Decrease the quantity of a product (when user adds product to cart)
-@app.route('/products/remove/<int:product_id>', methods=['POST'])
+@app.route('/products/decrease/<int:product_id>', methods=['POST'])
 def decrease_quantity_product(product_id):
     for product in products:
         if product["id"] == product_id:
+            if request.json.get('quantity') > product["quantity"] or product["quantity"] == 0:
+                return jsonify({"error": "Cannot remove product"}), 400
             product["quantity"] -= request.json.get('quantity')
-        return jsonify({"updated product": product})
+            return jsonify({"updated product": product}), 200
 
 # Endpoint 5: Increase the quantity of a product (when user removes product from cart)
-@app.route('/products/add/<int:product_id>', methods=['POST'])
+@app.route('/products/increase/<int:product_id>', methods=['POST'])
 def increase_quantity_product(product_id):
     for product in products:
         if product["id"] == product_id:
-            product["quantity"] += request.json.get('quantity')
-        return jsonify({"updated product": product})
+                product["quantity"] += request.json.get('quantity')
+                return jsonify({"updated product": product}), 200
        
 
 if __name__ == '__main__':
     app.run(debug=True, port=8001, host='https://shenoy-product-service.onrender.com')
-
-
-
-# POST endpoint should have additional json input with the quantity that will allow addition and subtraction of quantity of product
-
-
-# @app.route('/cart/<int:user_id>', methods=['GET'])
-# def get_user_cart(user_id):
-#     if user_id in carts :
-#                 return jsonify({"cart": carts[user_id]})
-#     else:
-#         return jsonify({"error: No cart associated with this userID"}), 404
